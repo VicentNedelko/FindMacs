@@ -80,14 +80,6 @@ namespace FindMacs
                     Console.WriteLine($"{denon.IpAddress} --> Status : {reply.Status}");
                 }
             }
-
-
-
-
-
-
-
-
             Console.ReadKey();
         }
     }
