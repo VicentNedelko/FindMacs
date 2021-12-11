@@ -44,18 +44,25 @@ namespace FindMacs
             {
                 Console.WriteLine($"IP - {machine.IpAddress} --> MAC - {machine.MacAddress}");
                 var mac = machine.MacAddress.Split(new char[] { '-' });
-                if(mac[0] == "00" & mac[1] == "05" & mac[2] == "cd")
+                if((mac[0] == "00" & mac[1] == "05" & mac[2] == "cd")
+                    || (mac[0] == "00" & mac[1] == "06" & mac[2] == "78")
+                    ||(mac[0] == "8c" & mac[1] == "a9" & mac[2] == "6f"))
                 {
                     denons.Add(machine);
                 }
             }
             Console.WriteLine("-----------------------");
+            if(denons.Count == 0)
+            {
+                Console.WriteLine("NO DENON or MARANTZ found. Press Enter.");
+            }
             foreach(var denon in denons)
             {
                 Console.WriteLine($"Denon - {denon.IpAddress} --> {denon.MacAddress}");
                 Ping ping = new();
                 IPAddress ip = IPAddress.Parse(denon.IpAddress);
                 PingReply reply = ping.Send(ip);
+                Console.WriteLine($"Trying establish TelNet to {ip}...");
                 if(reply.Status == IPStatus.Success)
                 {
                     try
@@ -66,14 +73,13 @@ namespace FindMacs
                         var plyrs = await commandProcessor.Execute(new GetPlayersCommand());
                         foreach (var p in plyrs.Payload)
                         {
-                            Console.WriteLine($"Player ID - {p.Pid}");
+                            Console.WriteLine($"Player ID - {p.Pid}, Name - {p.Name}, Model - {p.Model}, Version - {p.Version}");
                         }
                     }
                     catch
                     {
                         Console.WriteLine($"Unable to establish TelNet connection to {ip}");
                     }
-                    
                 }
                 else
                 {
